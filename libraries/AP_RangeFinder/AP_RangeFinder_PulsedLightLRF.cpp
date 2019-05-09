@@ -109,6 +109,7 @@ void AP_RangeFinder_PulsedLightLRF::timer(void)
             // for v3hp hw we start PHASE_MEASURE immediately after PHASE_COLLECT 
             break;
         }
+        break;
     }
 
     case PHASE_MEASURE:

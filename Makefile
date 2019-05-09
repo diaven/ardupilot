@@ -19,7 +19,7 @@ plane:
 
 copter:
 	$(MAKE) -C ArduCopter $(TARGET)
-
+cd 
 rover:
 	$(MAKE) -C APMrover2 $(TARGET)
 
