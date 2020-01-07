@@ -284,6 +284,14 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     AP_GROUPINFO("BLEND_TC", 21, AP_GPS, _blend_tc, 10.0f),
 #endif
 
+    // @Param: SELECT
+    // @DisplayName: GPS select (Labfly)
+    // @Description: manually select the active gps receiver by index, 255 = auto select
+    // @Range: -1 1
+    // @User: Advanced
+    AP_GROUPINFO("SELECT", 22, AP_GPS, _gps_select, DEFAULT_GPS_SELECT),
+
+
     AP_GROUPEND
 };
 
@@ -776,48 +784,54 @@ void AP_GPS::update(void)
             // select the second GPS instance
             primary_instance = 1;
         } else if (_auto_switch >= 1) {
-            // handling switching away from blended GPS
-            if (primary_instance == GPS_BLENDED_INSTANCE) {
-                primary_instance = 0;
-                for (uint8_t i=1; i<GPS_MAX_RECEIVERS; i++) {
-                    // choose GPS with highest state or higher number of satellites
-                    if ((state[i].status > state[primary_instance].status) ||
-                        ((state[i].status == state[primary_instance].status) && (state[i].num_sats > state[primary_instance].num_sats))) {
-                        primary_instance = i;
-                        _last_instance_swap_ms = now;
-                    }
-                }
-            } else {
-                // handle switch between real GPSs
-                for (uint8_t i=0; i<GPS_MAX_RECEIVERS; i++) {
-                    if (i == primary_instance) {
-                        continue;
-                    }
-                    if (state[i].status > state[primary_instance].status) {
-                        // we have a higher status lock, or primary is set to the blended GPS, change GPS
-                        primary_instance = i;
-                        _last_instance_swap_ms = now;
-                        continue;
-                    }
-
-                    bool another_gps_has_1_or_more_sats = (state[i].num_sats >= state[primary_instance].num_sats + 1);
-
-                    if (state[i].status == state[primary_instance].status && another_gps_has_1_or_more_sats) {
-
-                        bool another_gps_has_2_or_more_sats = (state[i].num_sats >= state[primary_instance].num_sats + 2);
-
-                        if ((another_gps_has_1_or_more_sats && (now - _last_instance_swap_ms) >= 20000) ||
-                            (another_gps_has_2_or_more_sats && (now - _last_instance_swap_ms) >= 5000)) {
-                            // this GPS has more satellites than the
-                            // current primary, switch primary. Once we switch we will
-                            // then tend to stick to the new GPS as primary. We don't
-                            // want to switch too often as it will look like a
-                            // position shift to the controllers.
+            if(_gps_select <= -1 || _gps_select >= GPS_MAX_RECEIVERS){
+                // handling switching away from blended GPS
+                if (primary_instance == GPS_BLENDED_INSTANCE) {
+                    primary_instance = 0;
+                    for (uint8_t i=1; i<GPS_MAX_RECEIVERS; i++) {
+                        // choose GPS with highest state or higher number of satellites
+                        if ((state[i].status > state[primary_instance].status) ||
+                            ((state[i].status == state[primary_instance].status) && (state[i].num_sats > state[primary_instance].num_sats))) {
                             primary_instance = i;
                             _last_instance_swap_ms = now;
                         }
                     }
+                } else {
+                    // handle switch between real GPSs
+                    for (uint8_t i=0; i<GPS_MAX_RECEIVERS; i++) {
+                        if (i == primary_instance) {
+                            continue;
+                        }
+                        if (state[i].status > state[primary_instance].status) {
+                            // we have a higher status lock, or primary is set to the blended GPS, change GPS
+                            primary_instance = i;
+                            _last_instance_swap_ms = now;
+                            continue;
+                        }
+
+                        bool another_gps_has_1_or_more_sats = (state[i].num_sats >= state[primary_instance].num_sats + 1);
+
+                        if (state[i].status == state[primary_instance].status && another_gps_has_1_or_more_sats) {
+
+                            bool another_gps_has_2_or_more_sats = (state[i].num_sats >= state[primary_instance].num_sats + 2);
+
+                            if ((another_gps_has_1_or_more_sats && (now - _last_instance_swap_ms) >= 20000) ||
+                                (another_gps_has_2_or_more_sats && (now - _last_instance_swap_ms) >= 5000)) {
+                                // this GPS has more satellites than the
+                                // current primary, switch primary. Once we switch we will
+                                // then tend to stick to the new GPS as primary. We don't
+                                // want to switch too often as it will look like a
+                                // position shift to the controllers.
+                                primary_instance = i;
+                                _last_instance_swap_ms = now;
+                            }
+                        }
+                    }
                 }
+            }
+            else {
+                // manually select active GPS receiver
+                primary_instance = _gps_select;
             }
         } else {
             // AUTO_SWITCH is 0 so no switching of GPSs
