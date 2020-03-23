@@ -1859,7 +1859,8 @@ bool AP_AHRS_NavEKF::is_ext_nav_used_for_yaw(void) const
     switch (active_EKF_type()) {
     case EKF_TYPE2:
         return EKF2.isExtNavUsedForYaw();
-        
+    case EKF_TYPE3:
+        return true;
     default:
         return false; 
     }
