@@ -68,6 +68,7 @@ enum Rotation : uint8_t {
     ROTATION_ROLL_90_PITCH_315   = 40,
     ROTATION_PITCH_7             = 41,
     LABFLY_PITCH_30             =  42,
+    LABFLY_ROLL_180_PITCH_30    =  43,
     ///////////////////////////////////////////////////////////////////////
     // Do not add more rotations without checking that there is not a conflict
     // with the MAVLink spec. MAV_SENSOR_ORIENTATION is expected to match our
