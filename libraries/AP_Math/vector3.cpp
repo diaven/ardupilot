@@ -262,8 +262,10 @@ void Vector3<T>::rotate(enum Rotation rotation)
     case LABFLY_ROLL_180_PITCH_30:{
         y=-y;
         z=-z;
-        x = 0.86602540378f*x + 0.5f*z;
+        tmp = 0.86602540378f*x + 0.5f*z;
         z = -0.5f*x+0.86602540378f*z;
+        x = tmp;
+        return;
     }
     case ROTATION_CUSTOM: // no-op; caller should perform custom rotations via matrix multiplication
         return;
