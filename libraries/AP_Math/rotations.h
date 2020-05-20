@@ -80,7 +80,7 @@ enum Rotation : uint8_t {
 };
 
 // maximum rotation that will be used for auto-detection
-#define ROTATION_MAX_AUTO_ROTATION ROTATION_ROLL_90_PITCH_315
+#define ROTATION_MAX_AUTO_ROTATION LABFLY_ROLL_180_PITCH_30
 
 /*
 Here are the same values in a form sutable for a @Values attribute in
