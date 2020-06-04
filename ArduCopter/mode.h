@@ -189,7 +189,7 @@ public:
         autopilot_yaw_mode default_mode(bool rtl) const;
 
         // rate_cds(): desired yaw rate in centidegrees/second:
-        float rate_cds() const;
+        float rate_cds(); // const;
         void set_rate(float new_rate_cds);
 
         // set_roi(...): set a "look at" location:
@@ -201,7 +201,7 @@ public:
                            bool relative_angle);
 
     private:
-
+        float get_weathercock_yaw_rate_cds();
         float look_ahead_yaw();
         float roi_yaw();
 
@@ -223,8 +223,13 @@ public:
         // heading when in yaw_look_ahead_yaw
         float _look_ahead_yaw;
 
+        // heading when weathercocking
+        float _weathercock_yaw_cds;
+
         // turn rate (in cds) when auto_yaw_mode is set to AUTO_YAW_RATE
         float _rate_cds;
+
+
 
         // used to reduce update rate to 100hz:
         uint8_t roi_yaw_counter;
