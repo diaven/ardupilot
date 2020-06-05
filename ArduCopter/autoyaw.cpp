@@ -5,10 +5,10 @@ Mode::AutoYaw Mode::auto_yaw;
 
 struct {
     AP_Float gain; // parameter for how quick the yaw axis will follow the rollaxis
-    AP_Float min_roll; // threshold in deg of roll angle that has no effect on
-    AP_Float min_pitch; // threshold in deg of pitch angle that has no effect on
-    AP_Float max_angle; //maximum angle to be considred for weathercocking
-    uint8_t max_yaw_rate; //maximum yaw rate to be commanded by weathercock mode in centi defgrees per second
+    AP_Int8 min_roll; // threshold in deg of roll angle that has no effect on
+    AP_Int8 min_pitch; // threshold in deg of pitch angle that has no effect on
+    AP_Int8 max_angle; //maximum angle to be considred for weathercocking
+    AP_Int16 max_yaw_rate; //maximum yaw rate to be commanded by weathercock mode in centi defgrees per second
     uint32_t last_pilot_yaw_rate_input_ms; //to avoid a fight between pilot input and weatherckock effect
     float yaw_rate_output;
 } weathercock;
@@ -32,10 +32,10 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
     */
 
     weathercock.min_roll = 1;
-    weathercock.gain = 1;
-    weathercock.min_pitch = 3;
-    weathercock.max_angle = 45.0f;
-    weathercock.max_yaw_rate = (uint8_t)2000;
+    weathercock.gain = copter.g.weathercock_gain;
+    weathercock.min_pitch = copter.g.weathercock_min_pitch;
+    weathercock.max_angle = copter.g.weathercock_max_angle;
+    weathercock.max_yaw_rate = copter.g.weathercock_max_yaw_rate;
 
     float roll = copter.wp_nav -> get_roll() / 100.0f; //get_roll() in centi degrees
     float pitch = copter.wp_nav -> get_pitch() / 100.0f;
@@ -55,34 +55,26 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
         roll += weathercock.min_roll;
     }
 
-    float yaw_output = constrain_float((roll/weathercock.max_angle) * weathercock.gain, -1, 1);
-    float pitch_output = constrain_float((pitch/weathercock.max_angle) * weathercock.gain, 0, 1);
-
-
+    float yaw_output = (roll/weathercock.max_angle) * weathercock.gain;
+    float pitch_output = (pitch/weathercock.max_angle) * weathercock.gain;
 
     if (yaw_output > 0){
-        weathercock.yaw_rate_output = yaw_output+pitch_output;
+        yaw_output = yaw_output+pitch_output;
     } else {
-        weathercock.yaw_rate_output = yaw_output-pitch_output;
+        yaw_output = yaw_output-pitch_output;
     }
 
-    /*maximum output of yaw_rate_output = yaw_output+pitch_output = 2
-    deviding the max_yaw_rate by 2 and multiplying it with the multipier will lead to a constrained overall output of
-    weathercock.max_yaw_rate.
-    */
+    yaw_output = constrain_float(yaw_output, -1, 1);
 
-    uint8_t multipier = weathercock.max_yaw_rate/2.0f;
+    weathercock.yaw_rate_output = yaw_output * weathercock.max_yaw_rate * 1.0f;
 
-    weathercock.yaw_rate_output = weathercock.yaw_rate_output * multipier;
-
+    AP::logger().Write("LF_W", "TimeUS,roll,pitch,yaw_unscaled,yaw_out","Qffff",
+                                       AP_HAL::micros64(),
+                                       (double)roll,
+                                       (double)pitch,
+                                       (double)yaw_output,
+                                       (double)weathercock.yaw_rate_output);
    
-        AP::logger().Write("Labfly", "TimeUS, weathercock_rate",
-                   "cdeg", // units
-                   "", // mult: 1e-6, 1e-2
-                   "float", // format: uint64_t, float
-                   AP_HAL::micros64(),
-                   (float)weathercock.yaw_rate_output);
-    
     return weathercock.yaw_rate_output;
     
 }
