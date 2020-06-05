@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-06-04T11:56:40. -->
+<!-- Written by QtCreator 4.12.2, 2020-06-05T10:34:07. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -65,6 +65,7 @@
    <value type="bool" key="AutoTest.UseGlobal">true</value>
    <valuelist type="QVariantList" key="ClangCodeModel.CustomCommandLineKey"/>
    <value type="bool" key="ClangCodeModel.UseGlobalConfig">true</value>
+   <value type="QString" key="ClangCodeModel.WarningConfigId">Builtin.Questionable</value>
    <valuemap type="QVariantMap" key="ClangTools">
     <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>
     <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.TidyAndClazy</value>
@@ -136,6 +137,8 @@
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Deploy</value>
     </valuemap>
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">1</value>
+    <valuemap type="QVariantMap" key="ProjectExplorer.DeployConfiguration.CustomData"/>
+    <value type="bool" key="ProjectExplorer.DeployConfiguration.CustomDataEnabled">false</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.DefaultDeployConfiguration</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.DeployConfigurationCount">1</value>

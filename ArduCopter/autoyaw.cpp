@@ -8,6 +8,7 @@ struct {
     AP_Float min_roll; // threshold in deg of roll angle that has no effect on
     AP_Float min_pitch; // threshold in deg of pitch angle that has no effect on
     AP_Float max_angle; //maximum angle to be considred for weathercocking
+    uint8_t max_yaw_rate; //maximum yaw rate to be commanded by weathercock mode in centi defgrees per second
     uint32_t last_pilot_yaw_rate_input_ms; //to avoid a fight between pilot input and weatherckock effect
     float yaw_rate_output;
 } weathercock;
@@ -31,13 +32,13 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
     */
 
     weathercock.min_roll = 1;
-    weathercock.gain = 50;
+    weathercock.gain = 1;
     weathercock.min_pitch = 3;
     weathercock.max_angle = 45.0f;
+    weathercock.max_yaw_rate = (uint8_t)2000;
 
     float roll = copter.wp_nav -> get_roll() / 100.0f; //get_roll() in centi degrees
     float pitch = copter.wp_nav -> get_pitch() / 100.0f;
-
 
     if (pitch < weathercock.min_pitch){
         pitch = 0; //we are asuming that a positive pitch value indicates tailwind
@@ -57,14 +58,33 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
     float yaw_output = constrain_float((roll/weathercock.max_angle) * weathercock.gain, -1, 1);
     float pitch_output = constrain_float((pitch/weathercock.max_angle) * weathercock.gain, 0, 1);
 
+
+
     if (yaw_output > 0){
         weathercock.yaw_rate_output = yaw_output+pitch_output;
     } else {
         weathercock.yaw_rate_output = yaw_output-pitch_output;
     }
 
+    /*maximum output of yaw_rate_output = yaw_output+pitch_output = 2
+    deviding the max_yaw_rate by 2 and multiplying it with the multipier will lead to a constrained overall output of
+    weathercock.max_yaw_rate.
+    */
 
-    return  weathercock.yaw_rate_output * 1000;
+    uint8_t multipier = weathercock.max_yaw_rate/2.0f;
+
+    weathercock.yaw_rate_output = weathercock.yaw_rate_output * multipier;
+
+   
+        AP::logger().Write("Labfly", "TimeUS, weathercock_rate",
+                   "cdeg", // units
+                   "", // mult: 1e-6, 1e-2
+                   "float", // format: uint64_t, float
+                   AP_HAL::micros64(),
+                   (float)weathercock.yaw_rate_output);
+    
+    return weathercock.yaw_rate_output;
+    
 }
 
 
