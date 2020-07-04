@@ -750,7 +750,7 @@ void ModeAuto::wp_run()
     // process pilot's yaw input
     float target_yaw_rate = 0;
     if (!copter.failsafe.radio) {
-        // get pilot's desired yaw rate
+        // get pilot's desired yaw< rate
         target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
         if (!is_zero(target_yaw_rate)) {
             auto_yaw.set_mode(AUTO_YAW_HOLD);

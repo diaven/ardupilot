@@ -66,16 +66,19 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
 
     yaw_output = constrain_float(yaw_output, -1, 1);
 
-    weathercock.yaw_rate_output = yaw_output * weathercock.max_yaw_rate * 1.0f;
+    weathercock.yaw_rate_output = weathercock.yaw_rate_output * 0.95f + yaw_output * 0.05f; //add 5% off new yaw output for simple damping
+
+    float scaled_output = weathercock.yaw_rate_output  * weathercock.max_yaw_rate * 1.0f;
 
     AP::logger().Write("LF_W", "TimeUS,roll,pitch,yaw_unscaled,yaw_out","Qffff",
                                        AP_HAL::micros64(),
                                        (double)roll,
                                        (double)pitch,
                                        (double)yaw_output,
-                                       (double)weathercock.yaw_rate_output);
+                                       (double)scaled_output);
    
-    return weathercock.yaw_rate_output;
+
+    return scaled_output;
     
 }
 
