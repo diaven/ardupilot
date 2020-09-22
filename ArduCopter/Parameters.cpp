@@ -36,6 +36,42 @@
 #endif
 
 const AP_Param::Info Copter::var_info[] = {
+
+    // @Param: WCOCK_GAIN
+    // @DisplayName: My New Parameter
+    // @Description: A description of my new parameter goes here
+    // @Range: -32768 32767
+    // @User: Advanced
+    GSCALAR(weathercock_gain, "WCOCK_GAIN", 0),
+
+    // @Param: WCOCK_MIN_ROLL
+    // @DisplayName: Weathercock minimum Roll
+    // @Description: threshold in the pitch angle for weathercock controller to respond positiv roll
+    // @Range: 0 60
+    // @User: Advanced
+    GSCALAR(weathercock_min_roll, "WCOCK_MIN_ROLL", 1),
+
+    // @Param: WCOCK_MIN_PITCH
+    // @DisplayName: Weathercock minimum Pitch
+    // @Description: threshold in the pitch angle for weathercock controller to respond positiv pitch values are considred as tailwind
+    // @Range: 0 90
+    // @User: Advanced
+    GSCALAR(weathercock_min_pitch, "WCOCK_MIN_PITCH", 3),
+
+    // @Param: WCOCK_MAX_ANGLE
+    // @DisplayName: Weathercock maximum angle
+    // @Description: The cutoff angle for weathercock controller higher angles will not lead to higher outputs 
+    // @Range: 0 60
+    // @User: Advanced
+    GSCALAR(weathercock_max_angle, "WCOCK_MAX_ANGLE", 45),
+
+    // @Param: WCOCK_YAW_RATE
+    // @DisplayName: Weathercock maximum Yaw Rate
+    // @Description: Maximum Yaw rate the Weathercock controller is allowed to command 
+    // @Range: 0 4000
+    // @User: Advanced
+    GSCALAR(weathercock_max_yaw_rate, "WCOCK_YAW_RATE", 2000),
+
     // @Param: SYSID_SW_MREV
     // @DisplayName: Eeprom format version number
     // @Description: This value is incremented when changes are made to the eeprom format
@@ -194,7 +230,7 @@ const AP_Param::Info Copter::var_info[] = {
     // @Param: WP_YAW_BEHAVIOR
     // @DisplayName: Yaw behaviour during missions
     // @Description: Determines how the autopilot controls the yaw during missions and RTL
-    // @Values: 0:Never change yaw, 1:Face next waypoint, 2:Face next waypoint except RTL, 3:Face along GPS course
+    // @Values: 0:Never change yaw, 1:Face next waypoint, 2:Face next waypoint except RTL, 3:Face along GPS course, 5: LF Weathercock
     // @User: Standard
     GSCALAR(wp_yaw_behavior,  "WP_YAW_BEHAVIOR",    WP_YAW_BEHAVIOR_DEFAULT),
 

@@ -373,9 +373,22 @@ public:
 
         // 254,255: reserved
 
+        k_param_weathercock_gain = 256, // parameter for how quick the yaw axis will follow the rollaxis
+        k_param_weathercock_min_roll, // threshold in deg of roll angle that has no effect on
+        k_param_weathercock_min_pitch, // threshold in deg of pitch angle that has no effect on
+        k_param_weathercock_max_angle, //maximum angle to be considred for weathercocking
+        k_param_weathercock_max_yaw_rate, //maximum yaw rate to be commanded by weathercock mode in centi defgrees per second
+
         // the k_param_* space is 9-bits in size
         // 511: reserved
     };
+
+    // LabFly weathercock control parameter
+    AP_Float        weathercock_gain;
+    AP_Int8         weathercock_min_roll;  
+    AP_Int8         weathercock_min_pitch;
+    AP_Int8         weathercock_max_angle;
+    AP_Int16        weathercock_max_yaw_rate;  
 
     AP_Int16        format_version;
 

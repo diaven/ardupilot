@@ -206,6 +206,25 @@ const AP_Param::GroupInfo AC_PosControl::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_ANGLE_MAX", 7, AC_PosControl, _lean_angle_max, 0.0f),
 
+    // @Param: ANGLE_PITCH
+    // @DisplayName: Waypoint max Pitch Angle 
+    // @Description: Defines the maximum angle the copter is allowed to tilt in pitch axis in order to gain speed
+    // @Units: cdeg
+    // @Range: -45 45
+    // @Increment: 1
+    // @User: Advanced
+    AP_GROUPINFO("_ANG_PITCH",       8, AC_PosControl, _wp_ang_pitch_cdeg, 0.0f),    
+
+    // @Param: ANGLE_ROLL
+    // @DisplayName: Waypoint max Pitch Angle PITCH
+    // @Description: Defines the maximum angle the copter is allowed to tilt in roll axis in order to gain speed
+    // @Units: cdeg
+    // @Range: -45 45
+    // @Increment: 1
+    // @User: Advanced
+    AP_GROUPINFO("_ANG_ROLL",       9, AC_PosControl, _wp_ang_roll_cdeg, 0.0f),    
+
+
     AP_GROUPEND
 };
 
@@ -1144,9 +1163,34 @@ void AC_PosControl::accel_to_lean_angles(float accel_x_cmss, float accel_y_cmss,
     accel_right = -accel_x_cmss * _ahrs.sin_yaw() + accel_y_cmss * _ahrs.cos_yaw();
 
     // update angle targets that will be passed to stabilize controller
-    pitch_target = atanf(-accel_forward / (GRAVITY_MSS * 100.0f)) * (18000.0f / M_PI);
+    
+
+
+
+  
+    
+    float pitch_target_unscaled =  atanf(-accel_forward / (GRAVITY_MSS * 100.0f)) * (18000.0f / M_PI);
+
+    if (_wp_ang_pitch_cdeg>0){
+        pitch_target = constrain_float(pitch_target_unscaled,-_wp_ang_pitch_cdeg,_wp_ang_pitch_cdeg);
+    }
+    else{
+        pitch_target = pitch_target_unscaled; 
+    }
+    
+
     float cos_pitch_target = cosf(pitch_target * M_PI / 18000.0f);
-    roll_target = atanf(accel_right * cos_pitch_target / (GRAVITY_MSS * 100.0f)) * (18000.0f / M_PI);
+
+
+    float roll_target_unscaled = atanf(accel_right * cos_pitch_target / (GRAVITY_MSS * 100.0f)) * (18000.0f / M_PI);
+    if (_wp_ang_roll_cdeg > 0){
+        roll_target  =constrain_float(roll_target_unscaled,-_wp_ang_roll_cdeg,_wp_ang_roll_cdeg);
+    }
+    else{
+        roll_target = roll_target_unscaled;
+    }
+
+
 }
 
 // get_lean_angles_to_accel - convert roll, pitch lean angles to lat/lon frame accelerations in cm/s/s

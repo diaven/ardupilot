@@ -254,9 +254,18 @@ void Vector3<T>::rotate(enum Rotation rotation)
         return;
     }
     case LABFLY_PITCH_30: {
-        tmp = x * 0.86603 + z * 0.5;
-        y = y;
-        z = -x * 0.5 + z * 0.86603;
+        const float sin30 = 0.5f;
+        const float cos30 = 0.866025404f;
+        float org_x = x;
+        float org_z = z;
+        x = org_x * cos30 + org_z * sin30;
+        z = -org_x * sin30 + z * cos30;
+        return;
+    }
+    case LABFLY_ROLL_180_PITCH_30:{
+        y = -y; z = -z;
+        tmp = 0.86602540378f*x + 0.5f*z;
+        z = -0.5f*x+0.86602540378f*z;
         x = tmp;
         return;
     }

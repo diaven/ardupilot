@@ -392,6 +392,8 @@ protected:
     AC_PID      _pid_accel_z;
     AC_P        _p_pos_xy;
     AC_PID_2D   _pid_vel_xy;
+    AP_Float    _wp_ang_pitch_cdeg;     // Defines the maximum angle the copter is allowed to tilt in pitch axis in order to gain speed
+    AP_Float    _wp_ang_roll_cdeg;      // Defines the maximum angle the copter is allowed to tilt in roll axis in order to gain speed
 
     // internal variables
     float       _dt;                    // time difference (in seconds) between calls from the main program

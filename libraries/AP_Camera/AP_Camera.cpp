@@ -69,7 +69,7 @@ const AP_Param::GroupInfo AP_Camera::var_info[] = {
     // @Range: 0 10000
     AP_GROUPINFO("MIN_INTERVAL",  6, AP_Camera, _min_interval, 0),
 
-    // @Param: MAX_ROLL
+    // @Param: 
     // @DisplayName: Maximum photo roll angle.
     // @Description: Postpone shooting if roll is greater than limit. (0=Disable, will shoot regardless of roll).
     // @User: Standard

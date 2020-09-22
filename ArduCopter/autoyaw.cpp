@@ -1,6 +1,17 @@
 #include "Copter.h"
 
+
 Mode::AutoYaw Mode::auto_yaw;
+
+struct {
+    AP_Float gain; // parameter for how quick the yaw axis will follow the rollaxis
+    AP_Int8 min_roll; // threshold in deg of roll angle that has no effect on
+    AP_Int8 min_pitch; // threshold in deg of pitch angle that has no effect on
+    AP_Int8 max_angle; //maximum angle to be considred for weathercocking
+    AP_Int16 max_yaw_rate; //maximum yaw rate to be commanded by weathercock mode in centi defgrees per second
+    uint32_t last_pilot_yaw_rate_input_ms; //to avoid a fight between pilot input and weatherckock effect
+    float yaw_rate_output;
+} weathercock;
 
 // roi_yaw - returns heading towards location held in roi
 float Mode::AutoYaw::roi_yaw()
@@ -13,6 +24,65 @@ float Mode::AutoYaw::roi_yaw()
 
     return _roi_yaw;
 }
+
+float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
+{
+    /*
+        the goal is to have the copter facing "nose into the wind" aka weathercocking
+    */
+
+    .min_roll = 1;
+    weathercock.gain = copter.g.weathercock_gain;
+    weathercock.min_pitch = copter.g.weathercock_min_pitch;
+    weathercock.max_angle = copter.g.weathercock_max_angle;
+    weathercock.max_yaw_rate = copter.g.weathercock_max_yaw_rate;
+
+    float roll = copter.wp_nav -> get_roll() / 100.0f; //get_roll() in centi degrees
+    float pitch = copter.wp_nav -> get_pitch() / 100.0f;
+
+    if (pitch < weathercock.min_pitch){
+        pitch = 0; //we are asuming that a positive pitch value indicates tailwind / bakward
+    }
+    pitch = fabs(pitch);
+
+    if (fabsf(roll) < weathercock.min_roll) {
+        weathercock.yaw_rate_output = 0;
+        return 0;
+    }
+    if (roll > 0) { //smoothing after exceed thershold
+        roll -= weathercock.min_roll;
+    } else {
+        roll += weathercock.min_roll;
+    }
+
+    float yaw_output = (roll/weathercock.max_angle) * weathercock.gain;
+    float pitch_output = (pitch/weathercock.max_angle) * weathercock.gain;
+
+    if (yaw_output > 0){
+        yaw_output = yaw_output+pitch_output;
+    } else {
+        yaw_output = yaw_output-pitch_output;
+    }
+
+    yaw_output = constrain_float(yaw_output, -1, 1);
+
+    weathercock.yaw_rate_output = weathercock.yaw_rate_output * 0.95f + yaw_output * 0.05f; //add 5% off new yaw output for simple damping
+
+    float scaled_output = weathercock.yaw_rate_output  * weathercock.max_yaw_rate * 1.0f;
+
+    AP::logger().Write("LF_W", "TimeUS,roll,pitch,yaw_unscaled,yaw_out","Qffff",
+                                       AP_HAL::micros64(),
+                                       (double)roll,
+                                       (double)pitch,
+                                       (double)yaw_output,
+                                       (double)scaled_output);
+   
+
+    return scaled_output;
+    
+}
+
+
 
 float Mode::AutoYaw::look_ahead_yaw()
 {
@@ -48,6 +118,9 @@ autopilot_yaw_mode Mode::AutoYaw::default_mode(bool rtl) const
 
     case WP_YAW_BEHAVIOR_LOOK_AHEAD:
         return AUTO_YAW_LOOK_AHEAD;
+
+    case WP_YAW_BEHAVIOR_WEATHERCOCK:
+        return LF_AUTO_YAW_WEATHERCOCK;
 
     case WP_YAW_BEHAVIOR_LOOK_AT_NEXT_WP:
     default:
@@ -88,6 +161,10 @@ void Mode::AutoYaw::set_mode(autopilot_yaw_mode yaw_mode)
 
     case AUTO_YAW_RESETTOARMEDYAW:
         // initial_armed_bearing will be set during arming so no init required
+        break;
+
+    case LF_AUTO_YAW_WEATHERCOCK:
+        _weathercock_yaw_cds = 0.0f;
         break;
 
     case AUTO_YAW_RATE:
@@ -197,6 +274,9 @@ float Mode::AutoYaw::yaw()
         // changes yaw to be same as when quad was armed
         return copter.initial_armed_bearing;
 
+    case LF_AUTO_YAW_WEATHERCOCK:
+        return 0.0f; //copter.wp_nav->get_yaw();
+
     case AUTO_YAW_LOOK_AT_NEXT_WP:
     default:
         // point towards next waypoint.
@@ -207,10 +287,13 @@ float Mode::AutoYaw::yaw()
 
 // returns yaw rate normally set by SET_POSITION_TARGET mavlink
 // messages (positive is clockwise, negative is counter clockwise)
-float Mode::AutoYaw::rate_cds() const
+float Mode::AutoYaw::rate_cds() // const
 {
     if (_mode == AUTO_YAW_RATE) {
         return _rate_cds;
+    }
+    if (_mode == LF_AUTO_YAW_WEATHERCOCK) {
+        return get_weathercock_yaw_rate_cds();
     }
 
     // return zero turn rate (this should never happen)

@@ -51,6 +51,7 @@ const AP_Param::GroupInfo AC_WPNav::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("ACCEL",       5, AC_WPNav, _wp_accel_cmss, WPNAV_ACCELERATION),
 
+
     // @Param: ACCEL_Z
     // @DisplayName: Waypoint Vertical Acceleration
     // @Description: Defines the vertical acceleration in cm/s/s used during missions
@@ -59,6 +60,7 @@ const AP_Param::GroupInfo AC_WPNav::var_info[] = {
     // @Increment: 10
     // @User: Standard
     AP_GROUPINFO("ACCEL_Z",     6, AC_WPNav, _wp_accel_z_cmss, WPNAV_WP_ACCEL_Z_DEFAULT),
+
 
     // @Param: RFND_USE
     // @DisplayName: Waypoint missions use rangefinder for terrain following

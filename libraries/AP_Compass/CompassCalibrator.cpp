@@ -873,6 +873,7 @@ bool CompassCalibrator::calculate_orientation(void)
     bool pass;
     if (besti == _orientation) {
         // if the orientation matched then allow for a low threshold
+        gcs().send_text(MAV_SEVERITY_INFO, "Chosen compass Rotation %d at variancec %.2f for compass: %u", (int)besti, (float)bestv, _compass_idx);
         pass = true;
     } else {
         pass = _orientation_confidence > variance_threshold;
