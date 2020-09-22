@@ -22,8 +22,6 @@
 #include "GPS_detect_state.h"
 #include <AP_SerialManager/AP_SerialManager.h>
 
-#define DEFAULT_GPS_SELECT -1  // Labfly default value for gps selct
-
 /**
    maximum number of GPS instances available on this platform. If more
    than 1 then redundant sensors may be available
@@ -502,8 +500,6 @@ protected:
     AP_Int16 _driver_options;
 
     uint32_t _log_gps_bit = -1;
-
-    AP_Int8 _gps_select;  /// Labfly: manually select used gps by index
 
 private:
     static AP_GPS *_singleton;
