@@ -32,7 +32,8 @@
 #define WPNAV_YAW_DIST_MIN                 200      // minimum track length which will lead to target yaw being updated to point at next waypoint.  Under this distance the yaw target will be frozen at the current heading
 #define WPNAV_YAW_LEASH_PCT_MIN         0.134f      // target point must be at least this distance from the vehicle (expressed as a percentage of the maximum distance it can be from the vehicle - i.e. the leash length)
 
-#define WPNAV_RANGEFINDER_FILT_Z         0.25f      // range finder distance filtered at 0.25hz
+#define WPNAV_RANGEFINDER_FILT_Z         0.25f      // range finder distance filtered at 0.25
+
 
 class AC_WPNav
 {
@@ -283,8 +284,9 @@ protected:
     AP_Float    _wp_speed_up_cms;       // default maximum climb rate in cm/s
     AP_Float    _wp_speed_down_cms;     // default maximum descent rate in cm/s
     AP_Float    _wp_radius_cm;          // distance from a waypoint in cm that, when crossed, indicates the wp has been reached
-    AP_Float    _wp_accel_cmss;          // horizontal acceleration in cm/s/s during missions
-    AP_Float    _wp_accel_z_cmss;        // vertical acceleration in cm/s/s during missions
+    AP_Float    _wp_accel_cmss;         // horizontal acceleration in cm/s/s during missions
+    AP_Float    _wp_accel_z_cmss;       // vertical acceleration in cm/s/s during missions
+
 
     // waypoint controller internal variables
     uint32_t    _wp_last_update;        // time of last update_wpnav call
