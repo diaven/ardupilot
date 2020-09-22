@@ -31,7 +31,7 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
         the goal is to have the copter facing "nose into the wind" aka weathercocking
     */
 
-    .min_roll = 1;
+    weathercock.min_roll = copter.g.weathercock_min_roll;
     weathercock.gain = copter.g.weathercock_gain;
     weathercock.min_pitch = copter.g.weathercock_min_pitch;
     weathercock.max_angle = copter.g.weathercock_max_angle;
