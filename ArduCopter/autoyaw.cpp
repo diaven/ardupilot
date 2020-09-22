@@ -43,9 +43,9 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
     if (pitch < weathercock.min_pitch){
         pitch = 0; //we are asuming that a positive pitch value indicates tailwind / bakward
     }
-    pitch = fabs(pitch);
+    pitch = fabsf(pitch);
 
-    if (fabs(roll) < weathercock.min_roll) {
+    if (fabsf(roll) < weathercock.min_roll) {
         weathercock.yaw_rate_output = 0;
         return 0;
     }
