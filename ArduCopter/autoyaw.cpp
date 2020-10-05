@@ -31,7 +31,7 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
         the goal is to have the copter facing "nose into the wind" aka weathercocking
     */
 
-    .min_roll = 1;
+    weathercock.min_roll = 1;
     weathercock.gain = copter.g.weathercock_gain;
     weathercock.min_pitch = copter.g.weathercock_min_pitch;
     weathercock.max_angle = copter.g.weathercock_max_angle;
@@ -43,7 +43,7 @@ float Mode::AutoYaw::get_weathercock_yaw_rate_cds(void)
     if (pitch < weathercock.min_pitch){
         pitch = 0; //we are asuming that a positive pitch value indicates tailwind / bakward
     }
-    pitch = fabs(pitch);
+    pitch = fabsf(pitch);
 
     if (fabsf(roll) < weathercock.min_roll) {
         weathercock.yaw_rate_output = 0;
