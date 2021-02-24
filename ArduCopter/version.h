@@ -6,7 +6,7 @@
 
 #include "ap_version.h"
 
-#define THISFIRMWARE "LabflyAC V4.0.4"
+#define THISFIRMWARE "LabflyAC V4.0.4-WCOCK_RTL_test"
 
 // the following line is parsed by the autotest scripts
 #define FIRMWARE_VERSION 4, 0, 4, FIRMWARE_VERSION_TYPE_OFFICIAL
